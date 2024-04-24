@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import { z } from 'zod'
+import { userZodSchema } from '../utils/validation.js'
 
 const { Schema } = mongoose
 
@@ -43,16 +43,6 @@ const userSchema = new Schema({
         default: Date.now,
         required: true,
     },
-})
-
-const userZodSchema = z.object({
-    firstName: z.string(),
-    lastName: z.string(),
-    userName: z.string(),
-    email: z.string().email(),
-    password: z.string(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
 })
 
 userSchema.pre('save', async function (next) {
