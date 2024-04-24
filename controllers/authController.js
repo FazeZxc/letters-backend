@@ -6,7 +6,6 @@ import { v4 as uuidv4 } from 'uuid'
 import nodemailer from 'nodemailer'
 import { EMAIL_NODEMAILER, JWT_SECRET, PASSWORD_NODEMAILER } from '../app.js'
 
-
 //REGISTER
 export const registerUser = async (req, res) => {
     const { firstName, lastName, userName, email, password } = req.body
@@ -27,6 +26,28 @@ export const registerUser = async (req, res) => {
     } catch (error) {
         console.log(error)
         res.status(501).json({ error: 'Error while registration' })
+    }
+}
+
+//AUTOLOGIN
+export const autoUserLogin = async (req, res) => {
+    const { token } = req.body
+    console.log(token)
+    if (!token) {
+        return res.status(401).json({ error: 'Unauthorized' })
+    }
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET)
+        const userId = decoded.userId
+
+        const user = await User.findById(userId)
+
+        if (!user) {
+            return res.status(401).json({ error: 'Unauthorized' })
+        }
+        res.status(200).json({ user, token })
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized' })
     }
 }
 

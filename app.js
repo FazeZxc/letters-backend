@@ -2,6 +2,8 @@ import express from 'express'
 import mongoose, { mongo } from 'mongoose'
 import cors from 'cors'
 import authRouter from './routes/authRoutes.js'
+import { createServer } from 'http'
+import { Server } from 'socket.io'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -20,10 +22,33 @@ export const JWT_SECRET = process.env.JWT_SECRET
 export const EMAIL_NODEMAILER = process.env.EMAIL_NODEMAILER
 export const PASSWORD_NODEMAILER = process.env.PASSWORD_NODEMAILER
 const app = express()
+const http = createServer(app)
 app.use(express.json())
 app.use(cors())
 
 app.use('/auth', authRouter)
+let users = []
+
+const io = new Server(http, { cors: { origin: 'http://localhost:5173' } })
+
+io.on('connection', (socket) => {
+    console.log(`⚡: ${socket.id} user just connected!`)
+    socket.on('message', (data) => {
+        io.emit('messageResponse', data)
+    })
+
+    socket.on('newUser', (data) => {
+        users.push(data)
+        io.emit('newUserResponse', users)
+    })
+    socket.on('typing', (data) => socket.broadcast.emit('typingResponse', data))
+    socket.on('disconnect', () => {
+        console.log('🔥: A user disconnected')
+        users = users.filter((user) => user.socketID !== socket.id)
+        io.emit('newUserResponse', users)
+        socket.disconnect()
+    })
+})
 
 app.get('/helloworld', (req, res) => {
     res.send('<h1>Hello World</h1>')
@@ -38,6 +63,6 @@ await mongoose
         console.log(error)
     })
 
-app.listen(PORT, () => {
+http.listen(PORT, () => {
     console.log('Server started at http://localhost:' + PORT)
 })
