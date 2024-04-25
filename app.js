@@ -23,20 +23,25 @@ export const EMAIL_NODEMAILER = process.env.EMAIL_NODEMAILER
 export const PASSWORD_NODEMAILER = process.env.PASSWORD_NODEMAILER
 const app = express()
 const http = createServer(app)
+
+// EXPRESS MIDDLEWARES
 app.use(express.json())
 app.use(cors())
-
 app.use('/auth', authRouter)
+
+// SOCKET
 let users = []
 
-const io = new Server(http, { cors: { origin: 'http://localhost:5173' } })
+export const io = new Server(http, {
+    cors: { origin: 'http://localhost:5173' },
+})
 
 io.on('connection', (socket) => {
+
     console.log(`⚡: ${socket.id} user just connected!`)
     socket.on('message', (data) => {
         io.emit('messageResponse', data)
     })
-
     socket.on('newUser', (data) => {
         users.push(data)
         io.emit('newUserResponse', users)
@@ -49,11 +54,9 @@ io.on('connection', (socket) => {
         socket.disconnect()
     })
 })
-
 app.get('/helloworld', (req, res) => {
     res.send('<h1>Hello World</h1>')
 })
-
 await mongoose
     .connect(DB_URI)
     .then(() => {

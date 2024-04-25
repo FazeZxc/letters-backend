@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET } from '../app'
+import { JWT_SECRET, io } from '../app'
 
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization']
@@ -16,4 +16,21 @@ const verifyToken = (req, res, next) => {
         next()
     })
 }
+
+io.use(function (socket, next) {
+    if (socket.handshake.query && socket.handshake.query.token) {
+        jwt.verify(
+            socket.handshake.query.token,
+            JWT_SECRET,
+            function (err, decoded) {
+                if (err) return next(new Error('Authentication error'))
+                socket.decoded = decoded
+                next()
+            }
+        )
+    } else {
+        next(new Error('Authentication error'))
+    }
+})
+
 export default verifyToken
