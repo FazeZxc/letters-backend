@@ -26,7 +26,7 @@ const http = createServer(app)
 
 // EXPRESS MIDDLEWARES
 app.use(express.json())
-app.use(cors())
+app.use(cors({ origin: 'https://letters-frontend.vercel.app' }))
 app.use('/auth', authRouter)
 
 // SOCKET
