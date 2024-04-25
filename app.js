@@ -16,6 +16,8 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const PORT = process.env.PORT
+export const BACKEND_URL = process.env.BACKEND_URL
+export const FRONTEND_URL = process.env.FRONTEND_URL
 export const DB_URI = process.env.DB_URI_DEV
 export const JWT_SECRET = process.env.JWT_SECRET
 
@@ -26,14 +28,18 @@ const http = createServer(app)
 
 // EXPRESS MIDDLEWARES
 app.use(express.json())
-app.use(cors({ origin: 'https://letters-frontend.vercel.app' }))
+app.use(
+    cors({
+        origin: FRONTEND_URL,
+    })
+)
 app.use('/auth', authRouter)
 
 // SOCKET
 let users = []
 
 export const io = new Server(http, {
-    cors: { origin: 'https://letters-frontend.vercel.app' },
+    cors: { origin: FRONTEND_URL },
 })
 
 io.on('connection', (socket) => {
@@ -66,5 +72,5 @@ await mongoose
     })
 
 http.listen(PORT, () => {
-    console.log('Server started')
+    console.log('Server started at: ' + BACKEND_URL)
 })

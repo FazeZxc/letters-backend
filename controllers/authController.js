@@ -4,7 +4,12 @@ import User from '../models/User.js'
 import jwt from 'jsonwebtoken'
 import { v4 as uuidv4 } from 'uuid'
 import nodemailer from 'nodemailer'
-import { EMAIL_NODEMAILER, JWT_SECRET, PASSWORD_NODEMAILER } from '../app.js'
+import {
+    EMAIL_NODEMAILER,
+    FRONTEND_URL,
+    JWT_SECRET,
+    PASSWORD_NODEMAILER,
+} from '../app.js'
 
 //REGISTER
 export const registerUser = async (req, res) => {
@@ -115,7 +120,7 @@ export const forgotPassword = async (req, res) => {
             from: 'randomuploader.en@gmail.com',
             to: email,
             subject: 'Password Reset Request',
-            html: `<p>You have requested a password reset. Click <a href="http://localhost:3000/auth/reset-password?token=${resetToken}">here</a> to reset your password.</p>`,
+            html: `<p>You have requested a password reset. Click <a href=${FRONTEND_URL}/auth/reset-password?token=${resetToken}">here</a> to reset your password.</p>`,
         }
 
         transporter.sendMail(mailOptions, (error, info) => {
