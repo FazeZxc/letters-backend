@@ -33,11 +33,10 @@ app.use('/auth', authRouter)
 let users = []
 
 export const io = new Server(http, {
-    cors: { origin: 'http://localhost:5173' },
+    cors: { origin: 'https://letters-frontend.vercel.app/' },
 })
 
 io.on('connection', (socket) => {
-
     console.log(`⚡: ${socket.id} user just connected!`)
     socket.on('message', (data) => {
         io.emit('messageResponse', data)
