@@ -33,7 +33,7 @@ app.use('/auth', authRouter)
 let users = []
 
 export const io = new Server(http, {
-    cors: { origin: 'https://letters-frontend.vercel.app/' },
+    cors: { origin: 'https://letters-frontend.vercel.app' },
 })
 
 io.on('connection', (socket) => {
@@ -66,5 +66,5 @@ await mongoose
     })
 
 http.listen(PORT, () => {
-    console.log('Server started at http://localhost:' + PORT)
+    console.log('Server started')
 })
